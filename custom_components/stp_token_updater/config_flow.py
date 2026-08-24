@@ -107,14 +107,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 provider_url = normalize_url(user_input[CONF_PROVIDER_URL])
-                self._abort_if_url_configured(provider_url)
+            except ValueError:
+                errors[CONF_PROVIDER_URL] = "invalid_url"
+            else:
+                if self._url_is_configured(provider_url):
+                    return self.async_abort(reason="already_configured")
                 self._input = {
                     CONF_PROVIDER_URL: provider_url,
                     CONF_AUTH_METHOD: user_input[CONF_AUTH_METHOD],
                 }
                 return await self.async_step_credential()
-            except ValueError:
-                errors[CONF_PROVIDER_URL] = "invalid_url"
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
@@ -133,6 +135,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data = {**self._input, credential_key: user_input.get(credential_key, "")}
             error = await self._async_validate_data(data)
             if error is None:
+                await self.async_set_unique_id(data[CONF_PROVIDER_URL])
+                self._abort_if_unique_id_configured()
                 return self.async_create_entry(title="STP Token Updater", data=data)
             errors[credential_key if error == "invalid_auth" else "base"] = error
         return self.async_show_form(
@@ -143,19 +147,30 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_reconfigure(self, user_input=None) -> ConfigFlowResult:
+        """Change only the provider address; credentials belong to reauth."""
         entry = self._get_reconfigure_entry()
         errors: dict[str, str] = {}
         if user_input is not None:
             try:
                 provider_url = normalize_url(user_input[CONF_PROVIDER_URL])
-                self._abort_if_url_configured(provider_url, exclude_entry_id=entry.entry_id)
-                self._input = {
-                    CONF_PROVIDER_URL: provider_url,
-                    CONF_AUTH_METHOD: user_input[CONF_AUTH_METHOD],
-                }
-                return await self.async_step_reconfigure_credential()
             except ValueError:
                 errors[CONF_PROVIDER_URL] = "invalid_url"
+            else:
+                if self._url_is_configured(
+                    provider_url,
+                    exclude_entry_id=entry.entry_id,
+                ):
+                    return self.async_abort(reason="already_configured")
+                data = {**entry.data, CONF_PROVIDER_URL: provider_url}
+                error = await self._async_validate_data(data)
+                if error is None:
+                    return self.async_update_reload_and_abort(
+                        entry,
+                        unique_id=provider_url,
+                        data=data,
+                        reason="reconfigure_successful",
+                    )
+                errors["base"] = error
         return self.async_show_form(
             step_id="reconfigure",
             data_schema=vol.Schema(
@@ -164,38 +179,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_PROVIDER_URL,
                         default=entry.data[CONF_PROVIDER_URL],
                     ): str,
-                    vol.Required(
-                        CONF_AUTH_METHOD,
-                        default=entry.data[CONF_AUTH_METHOD],
-                    ): _auth_selector(),
                 }
             ),
-            errors=errors,
-        )
-
-    async def async_step_reconfigure_credential(self, user_input=None) -> ConfigFlowResult:
-        credential_key = self._credential_key()
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            data = {**self._input, credential_key: user_input.get(credential_key, "")}
-            error = await self._async_validate_data(data)
-            if error is None:
-                entry = self._get_reconfigure_entry()
-                # Reconfiguration may switch auth methods, so remove the stale secret.
-                clean_data = {
-                    key: value
-                    for key, value in data.items()
-                    if key not in {CONF_API_KEY, CONF_PASSWORD} or key == credential_key
-                }
-                return self.async_update_reload_and_abort(
-                    entry,
-                    data_updates=clean_data,
-                    reason="reconfigure_successful",
-                )
-            errors[credential_key if error == "invalid_auth" else "base"] = error
-        return self.async_show_form(
-            step_id="reconfigure_credential",
-            data_schema=vol.Schema({vol.Required(credential_key): _credential_selector()}),
             errors=errors,
         )
 
@@ -226,17 +211,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         credential_key = self._credential_key()
         errors: dict[str, str] = {}
         if user_input is not None:
-            data = {**self._input, credential_key: user_input.get(credential_key, "")}
-            error = await self._async_validate_data(data)
+            candidate = {
+                CONF_PROVIDER_URL: self._input[CONF_PROVIDER_URL],
+                CONF_AUTH_METHOD: self._input[CONF_AUTH_METHOD],
+                credential_key: user_input.get(credential_key, ""),
+            }
+            error = await self._async_validate_data(candidate)
             if error is None:
                 entry = self._get_reauth_entry()
                 clean_data = {
-                    **entry.data,
-                    CONF_AUTH_METHOD: data[CONF_AUTH_METHOD],
-                    credential_key: data[credential_key],
+                    CONF_PROVIDER_URL: entry.data[CONF_PROVIDER_URL],
+                    CONF_AUTH_METHOD: candidate[CONF_AUTH_METHOD],
+                    credential_key: candidate[credential_key],
                 }
-                stale_key = CONF_PASSWORD if credential_key == CONF_API_KEY else CONF_API_KEY
-                clean_data.pop(stale_key, None)
                 return self.async_update_reload_and_abort(
                     entry,
                     data=clean_data,
@@ -256,18 +243,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else CONF_PASSWORD
         )
 
-    def _abort_if_url_configured(
+    def _url_is_configured(
         self,
         provider_url: str,
         *,
         exclude_entry_id: str | None = None,
-    ) -> None:
-        for entry in self._async_current_entries():
-            if entry.entry_id == exclude_entry_id:
-                continue
-            if entry.data.get(CONF_PROVIDER_URL) == provider_url:
-                self.async_abort(reason="already_configured")
-                raise config_entries.AbortFlow("already_configured")
+    ) -> bool:
+        return any(
+            entry.entry_id != exclude_entry_id
+            and entry.data.get(CONF_PROVIDER_URL) == provider_url
+            for entry in self._async_current_entries()
+        )
 
     async def _async_validate_data(self, data: dict[str, Any]) -> str | None:
         credential_key = (
