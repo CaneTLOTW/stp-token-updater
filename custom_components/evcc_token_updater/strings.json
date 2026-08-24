@@ -46,7 +46,7 @@
     "error": {
       "cannot_connect": "Der Token-Provider ist nicht erreichbar.",
       "invalid_auth": "Die Zugangsdaten wurden abgelehnt.",
-      "unsupported_evcc": "Die Antwort des Token-Providers wird nicht unterstützt.",
+      "unsupported_provider": "Die Antwort des Token-Providers wird nicht unterstützt.",
       "invalid_url": "Die Provider-URL ist ungültig.",
       "unknown": "Unbekannter Fehler."
     },
