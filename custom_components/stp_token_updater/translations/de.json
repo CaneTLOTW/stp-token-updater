@@ -1,0 +1,165 @@
+{
+  "title": "STP Token Updater",
+  "config": {
+    "step": {
+      "user": {
+        "title": "STP Token Updater",
+        "description": "Gib die direkte lokale API-Adresse des Token-Providers ein. Verwende keine Ingress-URL.",
+        "data": {
+          "provider_url": "Provider-URL",
+          "auth_method": "Authentifizierung"
+        }
+      },
+      "credential": {
+        "title": "Provider-Zugangsdaten",
+        "description": "Die Zugangsdaten werden ausschließlich im Home-Assistant-Config-Entry gespeichert und niemals über STP-Entitäten oder Diagnosedaten ausgegeben.",
+        "data": {
+          "api_key": "API-Key",
+          "password": "Administrator-Passwort"
+        }
+      },
+      "reconfigure": {
+        "title": "Provider-Verbindung ändern",
+        "data": {
+          "provider_url": "Provider-URL",
+          "auth_method": "Authentifizierung"
+        }
+      },
+      "reconfigure_credential": {
+        "title": "Provider-Zugangsdaten ändern",
+        "data": {
+          "api_key": "API-Key",
+          "password": "Administrator-Passwort"
+        }
+      },
+      "reauth_confirm": {
+        "title": "STP neu authentifizieren",
+        "description": "Der Provider hat die gespeicherten Zugangsdaten abgelehnt. Wähle die Authentifizierungsmethode für die Neuanmeldung.",
+        "data": {
+          "auth_method": "Authentifizierung"
+        }
+      },
+      "reauth_credential": {
+        "title": "Neue Provider-Zugangsdaten eingeben",
+        "data": {
+          "api_key": "API-Key",
+          "password": "Administrator-Passwort"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Der Token-Provider ist nicht erreichbar.",
+      "invalid_auth": "Die Zugangsdaten wurden abgelehnt.",
+      "unsupported_provider": "Die Antwort des Token-Providers wird nicht unterstützt.",
+      "invalid_url": "Die Provider-URL ist ungültig.",
+      "unknown": "Ein unerwarteter Fehler ist aufgetreten. Prüfe das Home-Assistant-Protokoll."
+    },
+    "abort": {
+      "already_configured": "Diese Provider-URL ist bereits eingerichtet.",
+      "reconfigure_successful": "Die STP-Verbindung wurde aktualisiert.",
+      "reauth_successful": "STP wurde erfolgreich neu authentifiziert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "STP Token Updater Optionen",
+        "description": "Dry-Run verhindert jeden Sponsor-Token-Schreibvorgang. Deaktiviere ihn nur für ein bewusstes Live-Update.",
+        "data": {
+          "automatic_updates": "Automatische Updates",
+          "dry_run": "Dry-Run: niemals einen Token schreiben",
+          "warning_hours": "Warnschwelle in Stunden",
+          "renewal_window_hours": "Erneuerungsfenster in Stunden",
+          "verification_delay_seconds": "Erste Verifikationsverzögerung in Sekunden",
+          "status_refresh_minutes": "Provider-Statusintervall in Minuten"
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "api_key": "API-Key (empfohlen)",
+        "password": "Administrator-Passwort"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "token_status": {
+        "name": "Token-Status",
+        "state": {
+          "healthy": "In Ordnung",
+          "checking": "Prüfung läuft",
+          "new_token_available": "Neuer Token verfügbar",
+          "renewal_window": "Erneuerungsfenster",
+          "update_due": "Update fällig",
+          "applying": "Token wird angewendet",
+          "verifying": "Verifikation läuft",
+          "warning": "Warnung",
+          "critical": "Kritisch",
+          "expired": "Abgelaufen",
+          "source_error": "Quellenfehler",
+          "provider_error": "Provider-Fehler",
+          "auth_error": "Authentifizierungsfehler",
+          "rate_limited": "Rate-Limit aktiv",
+          "configuration_conflict": "Konfigurationskonflikt"
+        }
+      },
+      "token_expires_at": {"name": "Token-Ablauf"},
+      "token_remaining_hours": {"name": "Token-Restlaufzeit"},
+      "token_type": {"name": "Token-Typ"},
+      "trial_candidate_expires_at": {"name": "Trial-Kandidat Ablauf"},
+      "trial_candidate_remaining_hours": {"name": "Trial-Kandidat Restlaufzeit"},
+      "token_next_attempt": {"name": "Nächster Versuch"},
+      "token_last_check": {"name": "Letzte Provider-Prüfung"},
+      "token_last_source_check": {"name": "Letzte Quellenprüfung"},
+      "token_last_update": {"name": "Letzter Updateversuch"},
+      "token_last_success": {"name": "Letzter verifizierter Erfolg"},
+      "token_last_error": {"name": "Letzter Fehler"},
+      "token_update_attempts": {"name": "Token-Schreibversuche"}
+    },
+    "binary_sensor": {
+      "token_valid": {"name": "Token gültig"},
+      "new_trial_token_available": {"name": "Neuer Trial-Token verfügbar"},
+      "token_update_required": {"name": "Token-Update erforderlich"},
+      "token_updater_problem": {"name": "Token-Updater Problem"},
+      "api_reachable": {"name": "Provider-API erreichbar"}
+    },
+    "button": {
+      "check_trial_token": {"name": "Trial-Token prüfen"},
+      "apply_trial_token_now": {"name": "Trial-Token jetzt anwenden"},
+      "verify_active_token": {"name": "Aktiven Token verifizieren"}
+    }
+  },
+  "issues": {
+    "authentication": {
+      "title": "STP-Authentifizierung fehlgeschlagen",
+      "description": "Der Provider hat die gespeicherten Zugangsdaten abgelehnt. Öffne die Integration und führe die Neuanmeldung durch."
+    },
+    "trial_source": {
+      "title": "Trial-Token-Quelle nicht verfügbar",
+      "description": "STP konnte die offizielle Trial-Token-Quelle nicht abrufen oder auswerten. Solange der Fehler besteht, wird kein Token geschrieben."
+    },
+    "renewal_warning": {
+      "title": "Token läuft bald ab",
+      "description": "Bis zum Ablauf verbleibt weniger als die konfigurierte Warnschwelle, ohne dass ein Ersatz verifiziert wurde."
+    },
+    "renewal_critical": {
+      "title": "Token-Ablauf kritisch",
+      "description": "Bis zum Ablauf verbleibt weniger als eine Stunde, ohne dass ein Ersatz verifiziert wurde."
+    },
+    "token_expired": {
+      "title": "Token abgelaufen",
+      "description": "Der aktive Token ist abgelaufen. STP hält das Problem sichtbar und versucht es nach dem kontrollierten Ablauf-Zeitplan erneut."
+    },
+    "yaml_conflict": {
+      "title": "Token wird durch eine Dateikonfiguration gesteuert",
+      "description": "Der Provider meldet einen per Datei/YAML verwalteten Sponsor-Token. Solange diese Quelle aktiv ist, kann STP einen per API geschriebenen Token nicht als maßgeblich verifizieren."
+    },
+    "rate_limit": {
+      "title": "Rate-Limit des Providers oder der Quelle aktiv",
+      "description": "STP hat eine Rate-Limit-Antwort erhalten. Weitere Netzwerkzugriffe werden nach Retry-After verschoben, sofern vorhanden; es gibt keine blinde Wiederholungsschleife."
+    }
+  }
+}
