@@ -4,6 +4,8 @@
 
 Home Assistant custom integration / HACS project for monitoring and managing a sponsor/trial-token lifecycle through a local provider API.
 
+[![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=CaneTLOTW&repository=stp-token-updater&category=integration)
+
 **STP = Sponsor Token Provider.** Provider-specific protocol identifiers are kept only where the upstream protocol requires them.
 
 ## Status
@@ -16,12 +18,31 @@ Token writes are protected by a `dry_run` option which defaults to enabled. Auto
 
 ## Installation via HACS
 
-1. HACS → Integrations → menu `⋮` → Custom repositories.
-2. Add `https://github.com/CaneTLOTW/stp-token-updater` as type **Integration**.
-3. Install **STP Token Updater** and restart Home Assistant.
-4. Settings → Devices & services → Add integration → **STP Token Updater**.
+### One-click installation
+
+Select the HACS badge above in Home Assistant. It opens the **Add custom
+repository** dialog with this repository and the **Integration** category
+already filled in. Confirm it, install **STP Token Updater** through HACS and
+restart Home Assistant.
+
+### Manual installation
+
+1. Open **HACS** → **Integrations**.
+2. Open the menu `⋮` → **Custom repositories**.
+3. Add `https://github.com/CaneTLOTW/stp-token-updater` with category
+   **Integration**.
+4. Search for **STP Token Updater** in HACS and select **Download**.
+5. Restart Home Assistant completely.
+6. Open **Settings** → **Devices & services** → **Add integration** and select
+   **STP Token Updater**.
+7. Enter the provider's direct local API URL and choose **API key**
+   (recommended) or **administrator password**.
+8. Leave **Dry-Run** enabled for the initial verification.
 
 For acceptance testing, keep **Dry-Run enabled** until the read-only paths, entities and authentication have been verified.
+
+> Do not use a Home Assistant Ingress URL. The integration must reach the
+> provider directly over its local API address.
 
 ## Setup
 
