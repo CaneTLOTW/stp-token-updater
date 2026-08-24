@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 DOMAIN = "stp_token_updater"
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 CONF_PROVIDER_URL = "provider_url"
 CONF_AUTH_METHOD = "auth_method"
@@ -21,7 +21,7 @@ CONF_STATUS_REFRESH_MINUTES = "status_refresh_minutes"
 AUTH_API_KEY = "api_key"
 AUTH_PASSWORD = "password"
 
-# Provider-specific protocol values. These are intentionally not anonymized.
+# Provider protocol values required for source and token validation.
 DEFAULT_SOURCE_URL = "https://docs.evcc.io/de/sponsorship/"
 ALLOWED_SOURCE_HOSTS = frozenset({"docs.evcc.io"})
 TRIAL_ISSUER = "evcc.io"
@@ -29,8 +29,7 @@ TRIAL_SUBJECT = "trial"
 DEFAULT_PROVIDER_PORT = 7070
 
 DEFAULT_AUTOMATIC_UPDATES = True
-# Safe pre-release default: no sponsor-token POST until explicitly disabled.
-DEFAULT_DRY_RUN = True
+DEFAULT_DRY_RUN = False
 DEFAULT_RENEWAL_WINDOW_HOURS = 48
 DEFAULT_WARNING_HOURS = 6
 DEFAULT_VERIFICATION_DELAY_SECONDS = 3.0
