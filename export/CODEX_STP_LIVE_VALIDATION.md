@@ -46,7 +46,7 @@ Die Regressionstests decken insbesondere diese zuvor fehleranfälligen Fälle ab
 | lokale `pytest`-Ausführung | nicht möglich: Das Live-System stellt weder `pytest` noch die HA-Testabhängigkeiten bereit. |
 | GitHub Actions: Tests | bestanden |
 | GitHub Actions: HASSfest | bestanden |
-| GitHub Actions: HACS | nur Repository-Metadaten offen; siehe Blocker |
+| GitHub Actions: HACS | erneute Prüfung nach Ergänzung von Beschreibung und Topics gestartet |
 
 Die CI-Analyse vor der Korrektur zeigte einen ungültig konfigurierten Pip-Cache
 im Testworkflow sowie zwei HASSfest-Befunde (Manifest-Reihenfolge und unnötiges
@@ -142,10 +142,7 @@ POST.
 
 ## Verbleibende menschliche Blocker
 
-1. **HACS-Repository-Metadaten:** Die HACS-Action beanstandet die fehlende
-   GitHub-Repository-Beschreibung und gültige Topics. Das sind
-   Repository-Einstellungen in GitHub, keine Codeänderung.
-2. **Vollautomatische Reauth-UI:** Home Assistants Core-REST-Endpunkt kann
+1. **Vollautomatische Reauth-UI:** Home Assistants Core-REST-Endpunkt kann
    User- und Reconfigure-Flows ausführen, aber keinen Reauth-Flow initiieren.
    Der reale Passwort-Login/Sessionpfad und der 401-Re-Login sind validiert;
    die vollständige Reauth-Dialognavigation sollte bei einer echten Credential-
