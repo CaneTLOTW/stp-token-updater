@@ -128,7 +128,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except EvccConnectionError:
                 errors["base"] = "cannot_connect"
             except EvccError:
-                errors["base"] = "unsupported_evcc"
+                errors["base"] = "unsupported_provider"
         return self.async_show_form(
             step_id="credential",
             data_schema=vol.Schema(
@@ -197,7 +197,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except EvccConnectionError:
                 errors["base"] = "cannot_connect"
             except EvccError:
-                errors["base"] = "unsupported_evcc"
+                errors["base"] = "unsupported_provider"
         return self.async_show_form(
             step_id="reconfigure_credential",
             data_schema=vol.Schema(
