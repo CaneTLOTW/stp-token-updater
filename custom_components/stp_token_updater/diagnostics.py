@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.core import HomeAssistant
 
 from . import StpConfigEntry
-from .const import CONF_AUTH_METHOD, CONF_PROVIDER_URL, VERSION
+from .const import CONF_AUTH_METHOD, VERSION
 from .token import short_fingerprint
 
 
@@ -21,7 +21,7 @@ async def async_get_config_entry_diagnostics(
     return {
         "integration_version": VERSION,
         "entry_id": entry.entry_id,
-        "provider_url": entry.data.get(CONF_PROVIDER_URL),
+        "provider_url": "REDACTED",
         "auth_method": entry.data.get(CONF_AUTH_METHOD),
         "credentials": "REDACTED",
         "options": dict(entry.options),
