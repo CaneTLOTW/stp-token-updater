@@ -37,11 +37,6 @@ class StpRuntimeData:
 StpConfigEntry = ConfigEntry[StpRuntimeData]
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the integration package."""
-    return True
-
-
 async def async_setup_entry(hass: HomeAssistant, entry: StpConfigEntry) -> bool:
     """Set up one STP provider connection."""
     auth_method = AuthMethod(entry.data[CONF_AUTH_METHOD])
