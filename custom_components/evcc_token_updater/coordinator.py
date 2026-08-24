@@ -124,7 +124,7 @@ class EvccTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
                 current.active_expiry - now if current.active_expiry else None
             )
             current.last_check = now
-            current.evcc_version = _extract_version(payload)
+            current.provider_version = _extract_version(payload)
             current.last_error = None
             current.last_error_class = None
             self._handle_observed_token_cycle(
@@ -137,12 +137,12 @@ class EvccTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
                 current, now, "auth_error", exc, REPAIR_AUTH
             )
         except (EvccConnectionError, EvccRateLimitError) as exc:
-            return await self._failure_state(current, now, "evcc_error", exc, None)
+            return await self._failure_state(current, now, "provider_error", exc, None)
         except (EvccError, SponsorStatusError) as exc:
-            return await self._failure_state(current, now, "evcc_error", exc, None)
+            return await self._failure_state(current, now, "provider_error", exc, None)
 
         if current.active_expiry is None:
-            current.updater_status = UpdaterStatus.EVCC_ERROR
+            current.updater_status = UpdaterStatus.PROVIDER_ERROR
             current.last_error = "provider returned no sponsor expiry"
             current.last_error_class = "sponsor_status_missing"
             self.store.data.update(
@@ -436,7 +436,7 @@ class EvccTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
 
     def _status_for(self, state: UpdaterState, now: datetime, schedule) -> UpdaterStatus:
         if state.active_expiry is None:
-            return UpdaterStatus.EVCC_ERROR
+            return UpdaterStatus.PROVIDER_ERROR
         level = escalation_level(now, state.active_expiry, self.warning_hours)
         if level == "expired":
             return UpdaterStatus.EXPIRED
@@ -519,13 +519,13 @@ class EvccTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
                 state.updater_status = (
                     UpdaterStatus.AUTH_ERROR
                     if status == "auth_error"
-                    else UpdaterStatus.EVCC_ERROR
+                    else UpdaterStatus.PROVIDER_ERROR
                 )
         else:
             state.updater_status = (
                 UpdaterStatus.AUTH_ERROR
                 if status == "auth_error"
-                else UpdaterStatus.EVCC_ERROR
+                else UpdaterStatus.PROVIDER_ERROR
             )
         self.store.data.update(
             last_check_at=_iso(now),
