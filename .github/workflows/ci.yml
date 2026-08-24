@@ -27,6 +27,69 @@ permissions:
   contents: read
 
 jobs:
+  version-guard:
+    name: Version guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify version sources agree
+        run: |
+          MANIFEST_VERSION="$(jq -r '.version' custom_components/stp_token_updater/manifest.json)"
+          CONST_VERSION="$(python - <<'PY'
+          import ast
+          from pathlib import Path
+
+          tree = ast.parse(Path('custom_components/stp_token_updater/const.py').read_text())
+          for node in tree.body:
+              if isinstance(node, ast.Assign):
+                  for target in node.targets:
+                      if isinstance(target, ast.Name) and target.id == 'VERSION':
+                          print(ast.literal_eval(node.value))
+                          raise SystemExit
+          raise SystemExit('VERSION not found in const.py')
+          PY
+          )"
+          if [ "$MANIFEST_VERSION" != "$CONST_VERSION" ]; then
+            echo "::error::manifest.json version ($MANIFEST_VERSION) and const.py VERSION ($CONST_VERSION) differ"
+            exit 1
+          fi
+
+      - name: Require a new version for integration changes
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE_SHA" ] || printf '%s' "$BASE_SHA" | grep -Eq '^0+$'; then
+            echo "No comparable base commit; skipping release-version guard."
+            exit 0
+          fi
+
+          if git diff --quiet "$BASE_SHA" "$GITHUB_SHA" -- custom_components/stp_token_updater; then
+            echo "No production integration change; no version bump required."
+            exit 0
+          fi
+
+          VERSION="$(jq -r '.version' custom_components/stp_token_updater/manifest.json)"
+          TAG="v$VERSION"
+
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Integration changed and $TAG has not been released yet: version is eligible."
+            exit 0
+          fi
+
+          TARGET="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq '.targetCommitish')"
+          if [ "$TARGET" = "$GITHUB_SHA" ]; then
+            echo "$TAG already points at this exact commit; allowing a CI rerun."
+            exit 0
+          fi
+
+          echo "::error::Production integration changed, but $TAG already exists. Bump VERSION in manifest.json and const.py before merging/pushing."
+          exit 1
+
   tests:
     name: Tests
     runs-on: ubuntu-latest
