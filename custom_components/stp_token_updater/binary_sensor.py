@@ -65,6 +65,7 @@ class StpBinarySensor(StpEntity, BinarySensorEntity):
                 state.active_expiry
                 and state.active_expiry > datetime.now(UTC)
                 and state.sponsor is not None
+                and state.sponsor.name
             )
         if key == "new_trial_token_available":
             return state.candidate_is_newer
