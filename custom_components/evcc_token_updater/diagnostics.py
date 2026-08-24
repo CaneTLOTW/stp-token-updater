@@ -15,11 +15,11 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry):
     return {
         "integration_version": "0.1.0",
         "entry_id": entry.entry_id,
-        "evcc_url": entry.data.get("evcc_url"),
+        "provider_url": entry.data.get("evcc_url"),
         "auth_method": entry.data.get("auth_method"),
         "credentials": {"api_key": "REDACTED", "password": "REDACTED"},
         "state": {
-            "evcc_version": state.evcc_version,
+            "provider_version": state.provider_version,
             "reachable": state.reachable,
             "updater_status": state.updater_status.value,
             "active_expiry": state.active_expiry.isoformat() if state.active_expiry else None,
