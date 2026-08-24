@@ -22,7 +22,7 @@ class EvccEntity(CoordinatorEntity):
             name=coordinator.entry.title,
             manufacturer="STP",
             model="Sponsor Token Provider",
-            sw_version=coordinator.state.evcc_version,
+            sw_version=coordinator.state.provider_version,
             configuration_url=coordinator.client.base_url,
             suggested_area=None,
         )
@@ -36,7 +36,7 @@ class EvccEntity(CoordinatorEntity):
         state = self.coordinator.state
         return {
             "provider_url": self.coordinator.client.base_url,
-            "provider_version": state.evcc_version,
+            "provider_version": state.provider_version,
             "reachable": state.reachable,
             "dry_run": state.dry_run,
         }
