@@ -44,7 +44,9 @@ Die Regressionstests decken insbesondere diese zuvor fehleranfälligen Fälle ab
 | JSON-Validierung von Manifest sowie deutscher und englischer Übersetzung | bestanden |
 | `git diff --check` | bestanden |
 | lokale `pytest`-Ausführung | nicht möglich: Das Live-System stellt weder `pytest` noch die HA-Testabhängigkeiten bereit. |
-| CI-Workflow | Erneuter GitHub-Lauf ist ausstehend; die erforderliche Pip-Cache-Korrektur kann ohne Workflow-Scope nicht veröffentlicht werden. |
+| GitHub Actions: Tests | bestanden |
+| GitHub Actions: HASSfest | bestanden |
+| GitHub Actions: HACS | nur Repository-Metadaten offen; siehe Blocker |
 
 Die CI-Analyse vor der Korrektur zeigte einen ungültig konfigurierten Pip-Cache
 im Testworkflow sowie zwei HASSfest-Befunde (Manifest-Reihenfolge und unnötiges
@@ -140,13 +142,10 @@ POST.
 
 ## Verbleibende menschliche Blocker
 
-1. **GitHub OAuth-Workflow-Scope:** Die Workflow-Datei kann ohne einen Token
-   mit `workflow` Scope nicht nach GitHub gepusht werden. Alle davon
-   unabhängigen Code-, Test- und Berichtänderungen sind veröffentlicht.
-2. **HACS-Repository-Metadaten:** Die HACS-Action beanstandet die fehlende
+1. **HACS-Repository-Metadaten:** Die HACS-Action beanstandet die fehlende
    GitHub-Repository-Beschreibung und gültige Topics. Das sind
    Repository-Einstellungen in GitHub, keine Codeänderung.
-3. **Vollautomatische Reauth-UI:** Home Assistants Core-REST-Endpunkt kann
+2. **Vollautomatische Reauth-UI:** Home Assistants Core-REST-Endpunkt kann
    User- und Reconfigure-Flows ausführen, aber keinen Reauth-Flow initiieren.
    Der reale Passwort-Login/Sessionpfad und der 401-Re-Login sind validiert;
    die vollständige Reauth-Dialognavigation sollte bei einer echten Credential-
