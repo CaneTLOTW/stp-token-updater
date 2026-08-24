@@ -153,7 +153,6 @@ class StpTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
             retry_not_before
             and retry_not_before > now
             and rate_scope in {"state", "auth"}
-            and not force_apply
         ):
             current.reachable = False
             current.last_check = now
@@ -171,6 +170,7 @@ class StpTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
             payload = await self.client.async_get_state()
             sponsor = parse_sponsor_status(payload)
         except ProviderAuthenticationError as exc:
+            self._clear_expired_rate_limit_if_due(now, {"state", "auth"})
             async_create_or_update(self.hass, REPAIR_AUTH, critical=True)
             raise ConfigEntryAuthFailed("Token provider authentication failed") from exc
         except ProviderRateLimitError as exc:
@@ -187,6 +187,7 @@ class StpTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
                 ) from exc
             return await self._provider_failure(current, now, exc, rate_limited=True)
         except (ProviderConnectionError, ProviderApiError, SponsorStatusError) as exc:
+            self._clear_expired_rate_limit_if_due(now, {"state", "auth"})
             if initial_refresh:
                 raise UpdateFailed("Unable to read token provider state") from exc
             return await self._provider_failure(current, now, exc)
@@ -367,6 +368,14 @@ class StpTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
                 current.last_error_class = "no_newer_candidate"
                 self.store.data["retry_apply_pending"] = False
 
+        # A Retry-After gate is only a temporary block. Once the due retry has
+        # actually reached its source/write decision, remove the old gate and
+        # its Repair unless that decision received a new future Retry-After.
+        # This intentionally happens *after* the apply path so a pending write
+        # cannot be discarded before its mandatory fresh source check.
+        if rate_retry_due:
+            self._clear_expired_rate_limit_if_due(now, {"source", "write"})
+
         current.remaining = current.active_expiry - now
         self.store.data["active_expires_at"] = _iso(current.active_expiry)
         self.store.data.setdefault(
@@ -492,6 +501,19 @@ class StpTokenCoordinator(DataUpdateCoordinator[UpdaterState]):
         )
         self._state.retry_not_before = None
         async_delete(self.hass, REPAIR_RATE_LIMIT)
+
+    def _clear_expired_rate_limit_if_due(
+        self,
+        now: datetime,
+        scopes: set[str],
+    ) -> None:
+        """Clear only a completed rate-limit gate, never a renewed one."""
+        if self.store.data.get("rate_limit_scope") not in scopes:
+            return
+        retry_at = _dt(self.store.data.get("retry_not_before"))
+        if retry_at is not None and retry_at > now:
+            return
+        self._clear_rate_limit_if_scope(scopes)
 
     def _handle_observed_token_cycle(
         self,
