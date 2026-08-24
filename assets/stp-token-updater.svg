@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">STP Token Updater</title>
+  <desc id="desc">An open lock in front of two circular update arrows.</desc>
+  <defs>
+    <linearGradient id="ring" x1="70" y1="80" x2="442" y2="432" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5b7cff"/>
+      <stop offset="1" stop-color="#31c9ad"/>
+    </linearGradient>
+    <linearGradient id="lock" x1="176" y1="162" x2="346" y2="394" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#d7e3f2"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="#0b1220" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <path d="M101 246c5-75 67-136 143-143 55-5 108 17 143 58l23-23c8-8 22-2 21 10l-6 83c-1 8-7 14-15 15l-83 6c-12 1-18-13-10-21l28-28c-25-27-61-42-98-38-44 4-80 35-92 76-4 14-17 23-31 20-15-3-25-18-23-35Z" fill="url(#ring)"/>
+  <path d="M411 266c-5 75-67 136-143 143-55 5-108-17-143-58l-23 23c-8 8-22 2-21-10l6-83c1-8 7-14 15-15l83-6c12-1 18 13 10 21l-28 28c25 27 61 42 98 38 44-4 80-35 92-76 4-14 17-23 31-20 15 3 25 18 23 35Z" fill="url(#ring)" opacity=".78"/>
+  <g filter="url(#shadow)">
+    <path d="M196 239v-35c0-49 37-91 86-97 30-4 60 7 82 29 10 10 10 27 0 37s-27 10-37 0c-11-11-26-16-41-14-22 3-38 22-38 45v35h-52Z" fill="none" stroke="url(#lock)" stroke-width="29" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="151" y="222" width="222" height="181" rx="42" fill="url(#lock)"/>
+    <rect x="166" y="237" width="192" height="151" rx="30" fill="#ffffff" fill-opacity=".18"/>
+    <path d="M262 274c-23 0-42 19-42 42 0 16 9 30 22 37v27c0 11 9 20 20 20s20-9 20-20v-27c13-7 22-21 22-37 0-23-19-42-42-42Z" fill="#203047"/>
+    <circle cx="262" cy="316" r="17" fill="#f8fbff"/>
+  </g>
+</svg>
