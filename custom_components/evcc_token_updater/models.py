@@ -23,7 +23,7 @@ class UpdaterStatus(StrEnum):
     CRITICAL = "critical"
     EXPIRED = "expired"
     SOURCE_ERROR = "source_error"
-    EVCC_ERROR = "evcc_error"
+    PROVIDER_ERROR = "provider_error"
     AUTH_ERROR = "auth_error"
     CONFIGURATION_ERROR = "configuration_error"
 
@@ -73,7 +73,7 @@ class TokenUpdateResult:
 
 @dataclass(slots=True)
 class UpdaterState:
-    evcc_version: str | None = None
+    provider_version: str | None = None
     reachable: bool = False
     sponsor: SponsorStatus | None = None
     active_expiry: datetime | None = None
