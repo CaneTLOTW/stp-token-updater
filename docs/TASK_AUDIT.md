@@ -1,56 +1,89 @@
-# STP Token Updater – Aufgabenabgleich
+# STP Token Updater – task audit
 
 Stand: 2026-08-24
+Version: v0.2.0 pre-release
+Domain: `stp_token_updater`
 
-Dieses Dokument trennt Code-Abdeckung von realer Live-Abnahme. Maßgeblich für die beim ersten Review gefundenen Fehler ist zusätzlich `REVIEW_2026-08-24.md`.
+The authoritative live-system validation sequence is `docs/CODEX_LIVE_HANDOFF.md`.
 
-## Im aktuellen Code vorhanden
+## Implemented in the current repository
 
-- eigenständige Home-Assistant-Custom-Integration;
-- HACS-Metadaten und UI-Config-Flow;
-- API-Key oder Administrator-Passwort/Session;
-- lokale Statusabfrage des Token-Providers;
-- Sponsor-/Trial-Ablaufzeit aus dem Provider-State;
-- Trial-JWT-Parser mit `iss`, `sub`, `iat`, `exp` und Fingerprint;
-- keine Persistenz vollständiger Trial-JWTs;
-- Scheduler `T-48h / T-12h / T-6h / T-1h / expired +6h`;
-- getrennte Source-Polling-Intervalle;
-- kein Write für gleichen/älteren Kandidaten;
-- Dry-Run als sicherer Default;
-- Single-POST + verzögerte Read-after-write-Verifikation;
-- Erkennung einer dateibasierten Token-Konfiguration;
-- HA-Entitäten, Buttons, Events und Repairs;
-- Diagnostics ohne Credentials/vollständigen JWT;
-- Dashboard- und Push-Beispiel;
-- pytest-, HACS- und hassfest-Workflows.
+- exactly one Home Assistant custom integration under `custom_components/stp_token_updater/`;
+- HACS metadata and UI Config Flow;
+- API-key or administrator-password/session authentication;
+- reconfigure and reauthentication flows;
+- `ConfigEntry.runtime_data` runtime model;
+- `OptionsFlowWithReload` options handling;
+- local provider state polling through a `DataUpdateCoordinator`;
+- sponsor/trial expiry parsing from provider state;
+- public trial-JWT parser with issuer/subject/timestamp plausibility and SHA-256 fingerprint metadata;
+- no persistence of full candidate JWTs;
+- scheduler `T-48h / T-12h / T-6h / T-1h / expired +6h`;
+- separate provider/source/write cadence;
+- no write for same/older candidate;
+- Dry-Run as safe default;
+- single-POST + delayed read-after-write verification;
+- uncertain POST timeout handled by readback instead of blind retry;
+- YAML/file-managed token conflict detection without falsely making an otherwise valid token invalid;
+- translated sensors, binary sensors, buttons, events and Repairs;
+- German and English self-contained translations;
+- diagnostics without credentials/full JWT;
+- local HA brand icon plus repository SVG branding;
+- dashboard and push-notification examples;
+- pytest, HACS and hassfest workflows;
+- pytest workflow targets Python 3.14.2 / Home Assistant 2026.8.2.
 
-## Im Review korrigierte Fehler
+## Important corrections already made
 
-- fehlender Passwort-Konstantenimport im Config Flow;
-- inkompatible `SensorEntityDescription`-Positionsargumente;
-- falscher Repairs-/Issue-Registry-Import;
-- wiederholtes Ausführen desselben Renewal-Checkpoints bei jedem 5-Minuten-Poll;
-- Source-Fehler ohne Fortschreiben des Source-Check-Zeitpunkts;
-- definite Auth-/Rate-Limit-Fehler wurden in der Write-Verifikation zu stark als unklarer Write behandelt;
-- dateibasierte Tokenquelle wurde fälschlich als ungültiger aktiver Token bewertet;
-- CI/HACS/Hassfest waren dokumentiert, aber im ersten Commit nicht vorhanden.
+- first implementation Config Flow password/import issues;
+- incompatible positional `SensorEntityDescription` construction;
+- wrong Repairs issue-registry import;
+- repeated execution of the same renewal checkpoint on every five-minute status poll;
+- source failure without advancing source-check timestamp;
+- definite auth/rate-limit write errors being hidden as generic verification failures;
+- file-managed token being considered invalid solely due to `yamlSource=file`;
+- public product/domain migration from legacy naming to `stp_token_updater`;
+- old integration directory removed completely;
+- runtime `strings.json` removed; translations are under `translations/*.json`;
+- entity descriptions now use translation keys;
+- token-valid binary sensor now requires a future expiry and an authorized sponsor/name;
+- local HA brand icon added;
+- regression tests expanded for scheduler boundaries, JWT parsing, URL normalization and single-write verification safety.
 
-## Noch nicht als vollständig abgenommen markieren
+## Known item that still requires executable testing
 
-1. alle GitHub Actions grün;
-2. Installation als realer Config Entry in Home Assistant;
-3. Entity Registry und Übersetzungen korrekt;
-4. API-Key-Auth live;
-5. Passwort-/Session-Auth live;
-6. Restart-Verhalten innerhalb der Scheduler-Fenster;
-7. Source-Fehler/Recovery ohne Polling-Sturm;
-8. ein kontrollierter echter Write mit strikt neuerem Kandidaten;
-9. erfolgreicher Readback und automatisches Aufräumen der Repairs.
+Rate-limit expiry/cleanup needs an explicit regression test with controllable time and fake provider/source objects. In particular verify that after `retry_not_before` is reached:
 
-## Live-Write-Sicherheit
+- exactly the intended source/write action resumes;
+- a pending apply intent is not lost prematurely;
+- stale `retry_not_before` / `rate_limit_scope` metadata is cleared appropriately;
+- the `rate_limit` Repair is removed when the condition is resolved;
+- `no_newer_candidate` after a due retry does not leave the Repair stuck;
+- no five-minute retry storm occurs.
 
-Automatisierte Tests dürfen keinen echten Sponsor-/Trial-Token-Write erzeugen. Ein Live-Test darf nur einmal bewusst erfolgen, wenn der Candidate nachweislich später abläuft als der aktive Token. Bei einem Transport-Timeout wird zuerst der Status gelesen und niemals sofort blind ein zweites POST gesendet.
+Codex must fix this if reproducible and add regression coverage. Do not provoke a real remote rate limit.
 
-## Branding
+## Still requiring live acceptance
 
-Die sichtbare Produktbezeichnung ist **STP Token Updater** (`Sponsor Token Provider`). Provider-spezifische interne Identifikatoren bleiben nur dort bestehen, wo sie Protokollanforderung oder Home-Assistant-Kompatibilitätsbestandteil sind.
+1. repository compile/pytest/HACS/hassfest results in an executable development environment;
+2. installation as a real Config Entry;
+3. local brand image and translated entity states in the HA frontend;
+4. API-key authentication live;
+5. password/session authentication live;
+6. reconfigure and reauthentication live;
+7. restart behavior inside lifecycle windows;
+8. source failure/recovery and Repairs cleanup;
+9. diagnostics/privacy audit;
+10. at most one controlled real write if and only if a strictly newer candidate exists.
+
+A missing newer candidate is a valid reason to skip item 10.
+
+## Return path
+
+Codex must write the hand-back report to:
+
+```text
+export/CODEX_STP_LIVE_VALIDATION.md
+```
+
+See `docs/CODEX_LIVE_HANDOFF.md` for required structure and safety constraints.
