@@ -1,0 +1,165 @@
+{
+  "title": "STP Token Updater",
+  "config": {
+    "step": {
+      "user": {
+        "title": "STP Token Updater",
+        "description": "Enter the direct local API address of the token provider. Do not use an ingress URL.",
+        "data": {
+          "provider_url": "Provider URL",
+          "auth_method": "Authentication"
+        }
+      },
+      "credential": {
+        "title": "Provider credentials",
+        "description": "The credential is stored only in the Home Assistant config entry and is never exposed by STP entities or diagnostics.",
+        "data": {
+          "api_key": "API key",
+          "password": "Administrator password"
+        }
+      },
+      "reconfigure": {
+        "title": "Change provider connection",
+        "data": {
+          "provider_url": "Provider URL",
+          "auth_method": "Authentication"
+        }
+      },
+      "reconfigure_credential": {
+        "title": "Change provider credentials",
+        "data": {
+          "api_key": "API key",
+          "password": "Administrator password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate STP",
+        "description": "The provider rejected the stored credential. Select the authentication method to use for reauthentication.",
+        "data": {
+          "auth_method": "Authentication"
+        }
+      },
+      "reauth_credential": {
+        "title": "Enter new provider credential",
+        "data": {
+          "api_key": "API key",
+          "password": "Administrator password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "The token provider cannot be reached.",
+      "invalid_auth": "The credential was rejected.",
+      "unsupported_provider": "The provider response is not supported.",
+      "invalid_url": "The provider URL is invalid.",
+      "unknown": "An unexpected error occurred. Check the Home Assistant log."
+    },
+    "abort": {
+      "already_configured": "This provider URL is already configured.",
+      "reconfigure_successful": "The STP connection was updated.",
+      "reauth_successful": "STP was reauthenticated successfully."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "STP Token Updater options",
+        "description": "Dry-run prevents every sponsor-token write. Disable it only for a deliberate live update.",
+        "data": {
+          "automatic_updates": "Automatic updates",
+          "dry_run": "Dry-run: never write a token",
+          "warning_hours": "Warning threshold in hours",
+          "renewal_window_hours": "Renewal window in hours",
+          "verification_delay_seconds": "First verification delay in seconds",
+          "status_refresh_minutes": "Provider status interval in minutes"
+        }
+      }
+    }
+  },
+  "selector": {
+    "auth_method": {
+      "options": {
+        "api_key": "API key (recommended)",
+        "password": "Administrator password"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "token_status": {
+        "name": "Token status",
+        "state": {
+          "healthy": "Healthy",
+          "checking": "Checking",
+          "new_token_available": "New token available",
+          "renewal_window": "Renewal window",
+          "update_due": "Update due",
+          "applying": "Applying",
+          "verifying": "Verifying",
+          "warning": "Warning",
+          "critical": "Critical",
+          "expired": "Expired",
+          "source_error": "Source error",
+          "provider_error": "Provider error",
+          "auth_error": "Authentication error",
+          "rate_limited": "Rate limited",
+          "configuration_conflict": "Configuration conflict"
+        }
+      },
+      "token_expires_at": {"name": "Token expires"},
+      "token_remaining_hours": {"name": "Token remaining"},
+      "token_type": {"name": "Token type"},
+      "trial_candidate_expires_at": {"name": "Trial candidate expires"},
+      "trial_candidate_remaining_hours": {"name": "Trial candidate remaining"},
+      "token_next_attempt": {"name": "Next attempt"},
+      "token_last_check": {"name": "Last provider check"},
+      "token_last_source_check": {"name": "Last source check"},
+      "token_last_update": {"name": "Last update attempt"},
+      "token_last_success": {"name": "Last verified success"},
+      "token_last_error": {"name": "Last error"},
+      "token_update_attempts": {"name": "Token write attempts"}
+    },
+    "binary_sensor": {
+      "token_valid": {"name": "Token valid"},
+      "new_trial_token_available": {"name": "New trial token available"},
+      "token_update_required": {"name": "Token update required"},
+      "token_updater_problem": {"name": "Token updater problem"},
+      "api_reachable": {"name": "Provider API reachable"}
+    },
+    "button": {
+      "check_trial_token": {"name": "Check trial token"},
+      "apply_trial_token_now": {"name": "Apply trial token now"},
+      "verify_active_token": {"name": "Verify active token"}
+    }
+  },
+  "issues": {
+    "authentication": {
+      "title": "STP authentication failed",
+      "description": "The provider rejected the stored credential. Open the integration and complete reauthentication."
+    },
+    "trial_source": {
+      "title": "Trial-token source unavailable",
+      "description": "STP could not fetch or parse the official trial-token source. No token is written while the source is unresolved."
+    },
+    "renewal_warning": {
+      "title": "Token expires soon",
+      "description": "Less than the configured warning threshold remains without a verified replacement."
+    },
+    "renewal_critical": {
+      "title": "Token expiry is critical",
+      "description": "Less than one hour remains without a verified replacement."
+    },
+    "token_expired": {
+      "title": "Token expired",
+      "description": "The active token has expired. STP keeps the problem visible and retries on the controlled post-expiry schedule."
+    },
+    "yaml_conflict": {
+      "title": "Token is controlled by a file configuration",
+      "description": "The provider reports a file/YAML-managed sponsor token. STP cannot verify an API-written token as authoritative while this source remains active."
+    },
+    "rate_limit": {
+      "title": "Provider or source rate limit active",
+      "description": "STP received a rate-limit response. Automatic network activity is deferred according to Retry-After when available; no blind retry loop is used."
+    }
+  }
+}
