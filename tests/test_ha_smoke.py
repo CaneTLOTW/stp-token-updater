@@ -45,7 +45,7 @@ def test_manifest_matches_new_public_domain() -> None:
     manifest = json.loads((INTEGRATION / "manifest.json").read_text())
     assert manifest["domain"] == "stp_token_updater"
     assert manifest["name"] == "STP Token Updater"
-    assert manifest["version"] == "0.2.0"
+    assert manifest["version"] == "0.2.1"
 
 
 def test_legacy_integration_directory_is_absent() -> None:
