@@ -1,0 +1,43 @@
+# Example Home Assistant automation for STP Token Updater warning events.
+# Replace notify.mobile_app_your_phone with your own notify service.
+# No token, API key, password or cookie is included in the event payload.
+
+alias: STP Token Updater - Warnung
+id: stp_token_updater_warning_push
+mode: queued
+max: 5
+
+triggers:
+  - trigger: event
+    event_type: stp_token_updater_warning
+
+actions:
+  - variables:
+      level: "{{ trigger.event.data.level | default('warning') }}"
+      remaining: "{{ trigger.event.data.remaining_hours | default(none) }}"
+      expires_at: "{{ trigger.event.data.expires_at | default('unbekannt') }}"
+      next_attempt: "{{ trigger.event.data.next_attempt_at | default('unbekannt') }}"
+      last_error: "{{ trigger.event.data.error_class | default('kein Fehlercode') }}"
+
+  - action: notify.mobile_app_your_phone
+    data:
+      title: >-
+        {% if level == 'critical' %}
+          STP Token kritisch
+        {% elif level == 'expired' %}
+          STP Token abgelaufen
+        {% else %}
+          STP Token Warnung
+        {% endif %}
+      message: >-
+        {% if remaining is not none %}
+          Der aktive Token hat noch {{ remaining | float | round(1) }} Stunden Restlaufzeit.
+        {% else %}
+          Die Restlaufzeit des aktiven Tokens konnte nicht bestimmt werden.
+        {% endif %}
+        Ablauf: {{ expires_at }}.
+        Nächster Versuch: {{ next_attempt }}.
+        Status: {{ last_error }}.
+      data:
+        tag: stp_token_updater
+        group: stp
