@@ -1,0 +1,12 @@
+{
+  "config": {
+    "step": {
+      "user": {"title": "STP Token Updater", "description": "Direkte API-Adresse des Token-Providers konfigurieren.", "data": {"evcc_url": "Provider-URL", "auth_method": "Authentifizierung"}},
+      "credential": {"title": "STP Zugangsdaten", "data": {"api_key": "API-Key", "password": "Administrator-Passwort"}},
+      "reconfigure": {"title": "STP Verbindung ändern", "data": {"evcc_url": "Provider-URL", "auth_method": "Authentifizierung"}},
+      "reconfigure_credential": {"title": "STP Zugangsdaten ändern", "data": {"api_key": "API-Key", "password": "Administrator-Passwort"}}
+    },
+    "error": {"cannot_connect": "Der Token-Provider ist nicht erreichbar.", "invalid_auth": "Zugangsdaten abgelehnt.", "unsupported_evcc": "Provider-Antwort nicht unterstützt.", "invalid_url": "Ungültige Provider-URL."},
+    "abort": {"already_configured": "Diese Provider-URL ist bereits eingerichtet.", "reconfigure_successful": "Die Verbindung wurde aktualisiert."}
+  }
+}
