@@ -1,0 +1,97 @@
+# Example native Home Assistant dashboard section/card stack.
+# Entity IDs are examples; verify the actual IDs after setup.
+# No custom frontend card is required.
+
+type: vertical-stack
+cards:
+  - type: heading
+    heading: STP Token Updater
+    icon: mdi:lock-open-variant-outline
+
+  - type: tile
+    entity: sensor.stp_token_status
+    name: Status
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_type
+    name: Token-Typ
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_expires_at
+    name: Gültig bis
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_remaining_hours
+    name: Restlaufzeit
+    vertical: false
+
+  - type: tile
+    entity: binary_sensor.stp_new_trial_token_available
+    name: Neuer Trial-Token verfügbar
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_trial_candidate_expires_at
+    name: Neuer Token gültig bis
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_next_attempt
+    name: Nächster Versuch
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_last_check
+    name: Letzte Prüfung
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_last_update
+    name: Letzter Updateversuch
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_last_success
+    name: Letztes erfolgreiches Update
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_update_attempts
+    name: Updateversuche
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_last_error
+    name: Letzter Fehler
+    vertical: false
+
+  - type: tile
+    entity: binary_sensor.stp_api_reachable
+    name: Provider erreichbar
+    vertical: false
+
+  - type: horizontal-stack
+    cards:
+      - type: button
+        entity: button.stp_check_trial_token
+        name: Jetzt prüfen
+        icon: mdi:refresh
+        tap_action:
+          action: toggle
+
+      - type: button
+        entity: button.stp_apply_trial_token_now
+        name: Jetzt anwenden
+        icon: mdi:key-change
+        tap_action:
+          action: toggle
+
+      - type: button
+        entity: button.stp_verify_active_token
+        name: Verifizieren
+        icon: mdi:check-decagram
+        tap_action:
+          action: toggle
