@@ -10,9 +10,11 @@ Home Assistant custom integration / HACS project for monitoring and managing a s
 
 ## Status
 
-**v0.2.0 – pre-release validation**
+**v0.2.0 – live validated**
 
-The production Home Assistant domain is now `stp_token_updater`. The repository contains exactly one custom integration under `custom_components/stp_token_updater/`.
+The production Home Assistant domain is `stp_token_updater`. The repository contains exactly one custom integration under `custom_components/stp_token_updater/`.
+
+The first real Home Assistant validation covered installation, API-key authentication, password/session authentication, provider/source reads, all entities, manual controls, persistence, diagnostics and a complete Home Assistant Core restart. A real token write was deliberately skipped because the observed candidate was not newer than the active token. See `export/CODEX_STP_LIVE_VALIDATION.md`.
 
 Token writes are protected by a `dry_run` option which defaults to enabled. Automated tests must never perform a real sponsor-token write.
 
@@ -20,29 +22,26 @@ Token writes are protected by a `dry_run` option which defaults to enabled. Auto
 
 ### One-click installation
 
-Select the HACS badge above in Home Assistant. It opens the **Add custom
-repository** dialog with this repository and the **Integration** category
-already filled in. Confirm it, install **STP Token Updater** through HACS and
-restart Home Assistant.
+Select the HACS badge above in Home Assistant. It opens the **Add custom repository** dialog with this repository and the **Integration** category already filled in. Confirm it, install **STP Token Updater** through HACS and restart Home Assistant.
 
 ### Manual installation
 
 1. Open **HACS** → **Integrations**.
 2. Open the menu `⋮` → **Custom repositories**.
-3. Add `https://github.com/CaneTLOTW/stp-token-updater` with category
-   **Integration**.
+3. Add `https://github.com/CaneTLOTW/stp-token-updater` with category **Integration**.
 4. Search for **STP Token Updater** in HACS and select **Download**.
 5. Restart Home Assistant completely.
-6. Open **Settings** → **Devices & services** → **Add integration** and select
-   **STP Token Updater**.
-7. Enter the provider's direct local API URL and choose **API key**
-   (recommended) or **administrator password**.
+6. Open **Settings** → **Devices & services** → **Add integration** and select **STP Token Updater**.
+7. Enter the provider's direct local API URL and choose **API key** (recommended) or **administrator password**.
 8. Leave **Dry-Run** enabled for the initial verification.
 
-For acceptance testing, keep **Dry-Run enabled** until the read-only paths, entities and authentication have been verified.
+> Do not use a Home Assistant Ingress URL. The integration must reach the provider directly over its local API address.
 
-> Do not use a Home Assistant Ingress URL. The integration must reach the
-> provider directly over its local API address.
+## Updates
+
+STP uses semantic versions from `custom_components/stp_token_updater/manifest.json` and GitHub Releases for user-facing updates. HACS tracks the latest release and exposes its normal Home Assistant update entity when a newer release is available.
+
+The repository release workflow runs only after a successful CI run on `main`. If the version in `manifest.json` does not yet have a corresponding GitHub Release, `v<version>` is published automatically. Therefore every integration change intended for users must increment the manifest version. README/docs/example-only changes do not require a version bump.
 
 ## Setup
 
@@ -79,6 +78,19 @@ T+...  retry every 6 hours until verified success
 
 Provider state polling, public source polling and write scheduling are separate. `429`/`Retry-After` handling prevents normal status polling from turning into a retry storm.
 
+## Dashboard examples
+
+- `examples/dashboard.yaml` – native Home Assistant cards using the actual default STP entity-ID scheme.
+- `examples/bubble-card.yaml` – compact Bubble Card for overview dashboards.
+
+The default main status entity is:
+
+```text
+sensor.stp_token_updater_token_status
+```
+
+Home Assistant may generate different IDs if entities are renamed, so adjust examples accordingly.
+
 ## Home Assistant implementation
 
 - Config Flow only; no YAML setup.
@@ -97,19 +109,21 @@ Provider state polling, public source polling and write scheduling are separate.
 - `docs/REQUIREMENTS.md` – authoritative lifecycle requirements.
 - `docs/RATE_LIMIT_AND_TESTING.md` – network/test safety rules.
 - `docs/CODEX_LIVE_HANDOFF.md` – ordered live-system acceptance handoff.
-- `examples/` – native dashboard and notification examples.
+- `docs/REVIEW_2026-08-25.md` – post-live review and remaining recommendations.
+- `examples/` – native and Bubble Card dashboard examples plus notification examples.
 - `assets/` – repository branding.
 
 ## Validation
 
-CI targets Home Assistant 2026.8.2 on Python 3.14.2 and includes:
+CI targets Home Assistant 2026.8.2 on Python 3.14.2 and combines:
 
-- Python compilation;
-- pytest;
+- Python compilation and pytest;
 - HACS validation;
-- hassfest validation.
+- Hassfest validation.
 
-A real provider write is **not** part of automated CI. The final live write acceptance test is explicit and optional, and may be performed only when the candidate is strictly newer than the active token.
+CI is path-filtered so documentation/dashboard-only commits do not create unnecessary runs. Concurrent outdated runs on the same ref are cancelled automatically.
+
+A real provider write is **not** part of automated CI. The live write acceptance test may be performed only when the candidate is strictly newer than the active token, unless a separately designed and explicitly enabled advanced force-reapply feature is added later.
 
 ## License
 

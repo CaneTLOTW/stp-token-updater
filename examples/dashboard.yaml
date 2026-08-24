@@ -1,6 +1,6 @@
-# Example native Home Assistant dashboard section/card stack.
-# Entity IDs are examples; verify the actual IDs after setup.
-# No custom frontend card is required.
+# Native Home Assistant dashboard example.
+# These entity IDs match the default IDs created by the STP Token Updater device.
+# If you renamed entities in Home Assistant, adjust them accordingly.
 
 type: vertical-stack
 cards:
@@ -9,88 +9,93 @@ cards:
     icon: mdi:lock-open-variant-outline
 
   - type: tile
-    entity: sensor.stp_token_status
+    entity: sensor.stp_token_updater_token_status
     name: Status
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_type
-    name: Token-Typ
+    entity: binary_sensor.stp_token_updater_token_valid
+    name: Token gültig
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_expires_at
+    entity: sensor.stp_token_updater_token_expires_at
     name: Gültig bis
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_remaining_hours
+    entity: sensor.stp_token_updater_token_remaining_hours
     name: Restlaufzeit
     vertical: false
 
   - type: tile
-    entity: binary_sensor.stp_new_trial_token_available
+    entity: binary_sensor.stp_token_updater_new_trial_token_available
     name: Neuer Trial-Token verfügbar
     vertical: false
 
   - type: tile
-    entity: sensor.stp_trial_candidate_expires_at
-    name: Neuer Token gültig bis
+    entity: sensor.stp_token_updater_trial_candidate_expires_at
+    name: Kandidat gültig bis
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_next_attempt
-    name: Nächster Versuch
+    entity: sensor.stp_token_updater_token_next_attempt
+    name: Nächster geplanter Versuch
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_last_check
-    name: Letzte Prüfung
+    entity: sensor.stp_token_updater_token_last_check
+    name: Letzte Provider-Prüfung
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_last_update
+    entity: sensor.stp_token_updater_token_last_source_check
+    name: Letzte Quellenprüfung
+    vertical: false
+
+  - type: tile
+    entity: sensor.stp_token_updater_token_last_update
     name: Letzter Updateversuch
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_last_success
-    name: Letztes erfolgreiches Update
+    entity: sensor.stp_token_updater_token_last_success
+    name: Letztes verifiziertes Update
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_update_attempts
-    name: Updateversuche
+    entity: sensor.stp_token_updater_token_update_attempts
+    name: Reale Schreibversuche
     vertical: false
 
   - type: tile
-    entity: sensor.stp_token_last_error
+    entity: sensor.stp_token_updater_token_last_error
     name: Letzter Fehler
     vertical: false
 
   - type: tile
-    entity: binary_sensor.stp_api_reachable
+    entity: binary_sensor.stp_token_updater_api_reachable
     name: Provider erreichbar
     vertical: false
 
   - type: horizontal-stack
     cards:
       - type: button
-        entity: button.stp_check_trial_token
-        name: Jetzt prüfen
+        entity: button.stp_token_updater_check_trial_token
+        name: Trial prüfen
         icon: mdi:refresh
         tap_action:
           action: toggle
 
       - type: button
-        entity: button.stp_apply_trial_token_now
-        name: Jetzt anwenden
+        entity: button.stp_token_updater_apply_trial_token_now
+        name: Anwenden
         icon: mdi:key-change
         tap_action:
           action: toggle
 
       - type: button
-        entity: button.stp_verify_active_token
+        entity: button.stp_token_updater_verify_active_token
         name: Verifizieren
         icon: mdi:check-decagram
         tap_action:

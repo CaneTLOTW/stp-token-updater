@@ -1,0 +1,58 @@
+# Compact Bubble Card for an overview dashboard.
+# Requires Bubble Card from HACS.
+
+type: custom:bubble-card
+card_type: button
+button_type: state
+card_layout: large
+entity: sensor.stp_token_updater_token_status
+name: STP Token
+icon: mdi:lock-open-check-outline
+force_icon: true
+show_name: true
+show_icon: true
+show_state: true
+show_attribute: false
+scrolling_effect: false
+sub_button:
+  main:
+    - entity: binary_sensor.stp_token_updater_token_valid
+      name: Gültig
+      icon: mdi:shield-check-outline
+      show_name: false
+      show_icon: true
+      show_state: false
+      show_background: false
+      state_background: true
+    - entity: sensor.stp_token_updater_token_remaining_hours
+      name: Restlaufzeit
+      icon: mdi:timer-sand
+      show_name: false
+      show_icon: true
+      show_state: true
+      show_background: false
+      state_background: false
+    - entity: sensor.stp_token_updater_token_expires_at
+      name: Gültig bis
+      icon: mdi:calendar-clock
+      show_name: false
+      show_icon: true
+      show_state: true
+      show_background: false
+      state_background: false
+    - entity: sensor.stp_token_updater_token_last_check
+      name: Letzte Prüfung
+      icon: mdi:clock-check-outline
+      show_name: false
+      show_icon: true
+      show_state: true
+      show_background: false
+      state_background: false
+    - entity: binary_sensor.stp_token_updater_new_trial_token_available
+      name: Neuer Token
+      icon: mdi:key-plus
+      show_name: false
+      show_icon: true
+      show_state: false
+      show_background: false
+      state_background: true
