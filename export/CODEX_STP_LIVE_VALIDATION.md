@@ -21,8 +21,7 @@ ohne strikt neueren Kandidaten wäre gegen die Sicherheitsvorgabe.
 | Commit | Änderung | Begründung |
 | --- | --- | --- |
 | `61a40ff` | Abgelaufene Retry-After-Gates werden nach ihrer fälligen Entscheidung sauber entfernt; ein manueller Apply umgeht kein aktives State/Auth-Rate-Limit. | Verhindert einen dauerhaft hängenden `rate_limit`-Repair bzw. ein Wiederholen vor Ablauf von Retry-After. |
-| lokal `575e1a8` | GitHub-Actions-Pip-Cache entfernt, Manifest-Schlüssel HASSfest-konform sortiert und nicht benötigtes `async_setup` entfernt. | Behebt die zuvor beobachteten CI-/HASSfest-Befunde. Die Workflow-Datei selbst ist wegen GitHub-Scope noch nicht veröffentlichbar. |
-| Client-Regressionstest | API-Key-Bearer-Header sowie Passwort-Cookie, ein 401 und genau ein Re-Login. | Sichert die Sicherheits- und Sessionlogik ohne einen Live-Fehler zu provozieren. |
+| `5415547` | Manifest-Schlüssel HASSfest-konform sortiert, nicht benötigtes `async_setup` entfernt und Client-Regressionstests ergänzt. | Behebt die HASSfest-Befunde und sichert die Sessionlogik ohne einen Live-Fehler zu provozieren. |
 
 ### Rate-Limit-Regression
 
@@ -45,7 +44,7 @@ Die Regressionstests decken insbesondere diese zuvor fehleranfälligen Fälle ab
 | JSON-Validierung von Manifest sowie deutscher und englischer Übersetzung | bestanden |
 | `git diff --check` | bestanden |
 | lokale `pytest`-Ausführung | nicht möglich: Das Live-System stellt weder `pytest` noch die HA-Testabhängigkeiten bereit. |
-| CI-Workflow | Korrektur ist vorbereitet; erneuter GitHub-Lauf ist durch den Workflow-Scope-Blocker ausstehend. |
+| CI-Workflow | Erneuter GitHub-Lauf ist ausstehend; die erforderliche Pip-Cache-Korrektur kann ohne Workflow-Scope nicht veröffentlicht werden. |
 
 Die CI-Analyse vor der Korrektur zeigte einen ungültig konfigurierten Pip-Cache
 im Testworkflow sowie zwei HASSfest-Befunde (Manifest-Reihenfolge und unnötiges
