@@ -35,8 +35,6 @@ class EvccBinarySensor(EvccEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         state = self.coordinator.state
         if self.entity_description_key == "token_valid":
-            # yamlSource=file is a configuration/update conflict, not proof that
-            # the currently active token is invalid.
             return bool(
                 state.active_expiry
                 and state.active_expiry > datetime.now(UTC)
@@ -59,7 +57,7 @@ class EvccBinarySensor(EvccEntity, BinarySensorEntity):
             UpdaterStatus.CRITICAL,
             UpdaterStatus.EXPIRED,
             UpdaterStatus.SOURCE_ERROR,
-            UpdaterStatus.EVCC_ERROR,
+            UpdaterStatus.PROVIDER_ERROR,
             UpdaterStatus.AUTH_ERROR,
             UpdaterStatus.CONFIGURATION_ERROR,
         }
