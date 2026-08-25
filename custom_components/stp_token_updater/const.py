@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 DOMAIN = "stp_token_updater"
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 
 CONF_PROVIDER_URL = "provider_url"
 CONF_AUTH_METHOD = "auth_method"

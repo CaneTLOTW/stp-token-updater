@@ -3,11 +3,11 @@
   "name": "STP Token Updater",
   "codeowners": ["@CaneTLOTW"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["frontend", "http"],
   "documentation": "https://github.com/CaneTLOTW/stp-token-updater",
   "integration_type": "hub",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/CaneTLOTW/stp-token-updater/issues",
   "requirements": [],
-  "version": "0.2.1"
+  "version": "0.2.2"
 }

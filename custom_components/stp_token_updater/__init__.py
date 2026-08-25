@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
+from homeassistant.components.frontend import add_extra_js_url
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.typing import ConfigType
 
 from .api import ProviderClient
 from .const import (
@@ -15,6 +19,7 @@ from .const import (
     CONF_AUTH_METHOD,
     CONF_PASSWORD,
     CONF_PROVIDER_URL,
+    VERSION,
 )
 from .coordinator import StpTokenCoordinator
 from .models import AuthMethod
@@ -22,6 +27,9 @@ from .storage import MetadataStore
 from .trial_source import TrialTokenSource
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
+
+_FRONTEND_FILE = Path(__file__).parent / "frontend" / "token-renewal-card.js"
+_FRONTEND_URL = "/stp_token_updater/token-renewal-card.js"
 
 
 @dataclass(slots=True)
@@ -35,6 +43,21 @@ class StpRuntimeData:
 
 
 StpConfigEntry = ConfigEntry[StpRuntimeData]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Register the bundled dashboard card once when the integration loads."""
+    await hass.http.async_register_static_paths(
+        [
+            StaticPathConfig(
+                _FRONTEND_URL,
+                str(_FRONTEND_FILE),
+                cache_headers=True,
+            )
+        ]
+    )
+    add_extra_js_url(hass, f"{_FRONTEND_URL}?v={VERSION}")
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: StpConfigEntry) -> bool:

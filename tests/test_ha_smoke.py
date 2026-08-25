@@ -45,7 +45,17 @@ def test_manifest_matches_new_public_domain() -> None:
     manifest = json.loads((INTEGRATION / "manifest.json").read_text())
     assert manifest["domain"] == "stp_token_updater"
     assert manifest["name"] == "STP Token Updater"
-    assert manifest["version"] == "0.2.1"
+    assert manifest["version"] == "0.2.2"
+    assert {"frontend", "http"}.issubset(manifest["dependencies"])
+
+
+def test_dashboard_card_is_bundled_for_card_picker() -> None:
+    card_path = INTEGRATION / "frontend" / "token-renewal-card.js"
+    card = card_path.read_text()
+    assert 'const CARD_TAG = "stp-token-renewal-card"' in card
+    assert 'name: "Token Renewal"' in card
+    assert "window.customCards" in card
+    assert "getEntitySuggestion" in card
 
 
 def test_legacy_integration_directory_is_absent() -> None:

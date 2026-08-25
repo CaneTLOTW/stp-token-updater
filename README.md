@@ -48,7 +48,36 @@ STP only writes when the candidate expires later than the active token. A write 
 
 The integration exposes token status and expiry information, provider reachability, renewal state, candidate information and update diagnostics, plus buttons to check the public source, apply an eligible candidate and verify the active token.
 
-Dashboard examples are available under [`examples/`](examples/), including a compact Bubble Card example.
+## Dashboard card
+
+From v0.2.2 the integration includes its own compact dashboard card. No separate HACS frontend plugin and no manual Lovelace resource are required.
+
+Open a dashboard in edit mode and choose **Add card → By card → Token Renewal**. The card is registered automatically by the integration and also appears as a suggestion when a matching STP entity is selected in Home Assistant 2026.6 or newer.
+
+The default card configuration is zero-config for a normal single STP installation:
+
+```yaml
+type: custom:stp-token-renewal-card
+```
+
+It displays the current token status, validity, remaining lifetime, expiry, last provider check and whether a newer token candidate is available. The overview is intentionally read-only; pressing the manual apply button remains an explicit action through the STP device entities.
+
+If entity IDs were renamed, they can be overridden explicitly:
+
+```yaml
+type: custom:stp-token-renewal-card
+title: Token Renewal
+entities:
+  status: sensor.stp_token_updater_token_status
+  valid: binary_sensor.stp_token_updater_token_valid
+  remaining: sensor.stp_token_updater_token_remaining_hours
+  expires: sensor.stp_token_updater_token_expires_at
+  lastCheck: sensor.stp_token_updater_token_last_check
+  candidate: binary_sensor.stp_token_updater_new_trial_token_available
+  problem: binary_sensor.stp_token_updater_updater_problem
+```
+
+Additional dashboard examples remain available under [`examples/`](examples/), including the optional Bubble Card example.
 
 ## Releases and HACS updates
 
