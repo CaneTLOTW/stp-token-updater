@@ -69,6 +69,22 @@ def test_expired_retry_is_six_hourly() -> None:
     ).due is True
 
 
+def test_evcc_zero_time_expiry_does_not_underflow() -> None:
+    """An expired Go zero-time value must enter recovery before checkpoint math."""
+    now = datetime(2026, 9, 4, 21, tzinfo=UTC)
+    expires = datetime(1, 1, 1, tzinfo=UTC)
+
+    result = calculate_schedule(
+        now=now,
+        expires_at=expires,
+        last_action_at=None,
+    )
+
+    assert result.due is True
+    assert result.next_attempt == now
+    assert result.stage == "expired"
+
+
 def test_missed_checkpoints_are_not_replayed_in_sequence() -> None:
     expires = datetime(2026, 8, 25, 12, tzinfo=UTC)
     now = expires - timedelta(minutes=30)

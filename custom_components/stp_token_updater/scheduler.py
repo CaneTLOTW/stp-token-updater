@@ -27,6 +27,17 @@ def calculate_schedule(
     """Calculate the currently due checkpoint and next planned attempt."""
     if now.tzinfo is None or expires_at.tzinfo is None:
         raise ValueError("now and expires_at must be timezone-aware")
+
+    # Providers may expose an ancient sentinel timestamp for an expired or
+    # otherwise unusable token (for example Go's year-1 zero time). Handle the
+    # expired path before subtracting renewal checkpoints so datetime arithmetic
+    # cannot underflow below Python's minimum representable date.
+    if now >= expires_at:
+        if last_action_at is None or last_action_at < expires_at:
+            return ScheduleDecision(True, now, "expired")
+        next_attempt = last_action_at + POST_EXPIRY_RETRY
+        return ScheduleDecision(now >= next_attempt, max(now, next_attempt), "expired")
+
     renewal_window = timedelta(hours=renewal_window_hours)
     checkpoints = [
         (expires_at - renewal_window, "renewal_window"),
@@ -36,11 +47,6 @@ def calculate_schedule(
     ]
     if now < checkpoints[0][0]:
         return ScheduleDecision(False, checkpoints[0][0], "healthy")
-    if now >= expires_at:
-        if last_action_at is None or last_action_at < expires_at:
-            return ScheduleDecision(True, now, "expired")
-        next_attempt = last_action_at + POST_EXPIRY_RETRY
-        return ScheduleDecision(now >= next_attempt, max(now, next_attempt), "expired")
 
     crossed = max(i for i, (at, _stage) in enumerate(checkpoints) if now >= at)
     current_at, stage = checkpoints[crossed]
