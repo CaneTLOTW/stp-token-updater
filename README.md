@@ -83,6 +83,8 @@ Additional dashboard examples remain available under [`examples/`](examples/), i
 
 Published GitHub releases are the HACS update channel. Production integration changes must bump the version in both `manifest.json` and `const.py`; CI enforces this and the release workflow publishes the new version after successful validation.
 
+After a HACS-managed integration update, restart Home Assistant before relying on the new Python code. HACS/Home Assistant can surface this as a restart-required repair or notification with a direct restart action.
+
 ## Validation
 
 CI runs Python compilation, pytest, HACS validation and hassfest. Network write safety and the current test scope are summarized in [`docs/TESTING.md`](docs/TESTING.md).
