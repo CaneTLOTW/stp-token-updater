@@ -11,6 +11,14 @@ ROOT = Path(__file__).parents[1]
 INTEGRATION = ROOT / "custom_components" / "stp_token_updater"
 
 
+def _translation_shape(value):
+    if isinstance(value, dict):
+        return {key: _translation_shape(item) for key, item in sorted(value.items())}
+    if isinstance(value, list):
+        return [_translation_shape(item) for item in value]
+    return None
+
+
 def test_sensor_descriptions_use_translation_keys() -> None:
     from custom_components.stp_token_updater.sensor import DESCRIPTIONS
 
@@ -48,14 +56,16 @@ def test_repairs_module_uses_current_issue_registry_api() -> None:
     assert callable(repairs.async_delete)
 
 
-def test_custom_integration_translation_files_are_self_contained() -> None:
+def test_custom_integration_translation_files_are_complete_and_in_sync() -> None:
     en = json.loads((INTEGRATION / "translations" / "en.json").read_text())
     de = json.loads((INTEGRATION / "translations" / "de.json").read_text())
     for payload in (en, de):
         assert "config" in payload
         assert "options" in payload
+        assert "selector" in payload
         assert "entity" in payload
         assert "issues" in payload
+    assert _translation_shape(en) == _translation_shape(de)
     assert not (INTEGRATION / "strings.json").exists()
 
 
@@ -67,11 +77,26 @@ def test_manifest_matches_new_public_domain() -> None:
     assert {"frontend", "http"}.issubset(manifest["dependencies"])
 
 
-def test_dashboard_card_is_bundled_for_card_picker() -> None:
+def test_hacs_metadata_has_no_unnecessary_home_assistant_minimum() -> None:
+    hacs = json.loads((ROOT / "hacs.json").read_text())
+    assert hacs["name"] == "STP Token Updater"
+    assert "homeassistant" not in hacs
+
+
+def test_local_brand_icon_is_bundled() -> None:
+    icon = INTEGRATION / "brand" / "icon.png"
+    assert icon.exists()
+    assert icon.stat().st_size > 0
+
+
+def test_dashboard_card_is_bundled_localized_and_has_english_fallback() -> None:
     card_path = INTEGRATION / "frontend" / "token-renewal-card.js"
     card = card_path.read_text()
     assert 'const CARD_TAG = "stp-token-renewal-card"' in card
-    assert 'name: "Token Renewal"' in card
+    assert "const TRANSLATIONS" in card
+    assert "language.startsWith(\"de\") ? \"de\" : \"en\"" in card
+    assert 'problem: ["binary_sensor", "token_updater_problem"]' in card
+    assert 'name: "STP Token Updater"' in card
     assert "window.customCards" in card
     assert "getEntitySuggestion" in card
 
