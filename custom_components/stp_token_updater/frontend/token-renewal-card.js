@@ -7,7 +7,40 @@ const DEFAULT_ENTITIES = {
   expires: ["sensor", "token_expires_at"],
   lastCheck: ["sensor", "token_last_check"],
   candidate: ["binary_sensor", "new_trial_token_available"],
-  problem: ["binary_sensor", "updater_problem"],
+  problem: ["binary_sensor", "token_updater_problem"],
+};
+
+const TRANSLATIONS = {
+  en: {
+    title: "Token Renewal",
+    healthUnknown: "Unknown",
+    healthProblem: "Problem",
+    healthValid: "Valid",
+    healthInvalid: "Invalid",
+    candidateAvailable: "Available",
+    candidateNone: "None",
+    remaining: "Remaining",
+    expires: "Expires",
+    lastCheck: "Last check",
+    newToken: "New token",
+    missing:
+      "STP Token Updater entities were not found. Configure the integration first or override the entity IDs in YAML.",
+  },
+  de: {
+    title: "Token-Erneuerung",
+    healthUnknown: "Unbekannt",
+    healthProblem: "Problem",
+    healthValid: "Gültig",
+    healthInvalid: "Ungültig",
+    candidateAvailable: "Verfügbar",
+    candidateNone: "Keiner",
+    remaining: "Restlaufzeit",
+    expires: "Ablauf",
+    lastCheck: "Letzte Prüfung",
+    newToken: "Neuer Token",
+    missing:
+      "STP-Token-Updater-Entitäten wurden nicht gefunden. Richte zuerst die Integration ein oder überschreibe die Entity-IDs in YAML.",
+  },
 };
 
 const escapeHtml = (value) =>
@@ -42,6 +75,16 @@ class StpTokenRenewalCard extends HTMLElement {
 
   getCardSize() {
     return 2;
+  }
+
+  _language() {
+    const language = String(this._hass?.language || "en").toLowerCase();
+    return language.startsWith("de") ? "de" : "en";
+  }
+
+  _t(key) {
+    const language = this._language();
+    return TRANSLATIONS[language]?.[key] ?? TRANSLATIONS.en[key] ?? key;
   }
 
   _resolveEntity(key) {
@@ -138,30 +181,33 @@ class StpTokenRenewalCard extends HTMLElement {
     const validState = this._state(validEntity)?.state;
     const candidateState = this._state(candidateEntity)?.state;
     const problemState = this._state(problemEntity)?.state;
-    const title = this._config?.title || "Token Renewal";
+    const title = this._config?.title || this._t("title");
     const status = this._display(statusEntity);
     const hasStpEntities = Boolean(this._state(statusEntity));
 
     let healthClass = "unknown";
     let healthIcon = "mdi:shield-question-outline";
-    let healthText = "Unknown";
+    let healthText = this._t("healthUnknown");
 
     if (problemState === "on") {
       healthClass = "problem";
       healthIcon = "mdi:alert-circle-outline";
-      healthText = "Problem";
+      healthText = this._t("healthProblem");
     } else if (validState === "on") {
       healthClass = "valid";
       healthIcon = "mdi:shield-check-outline";
-      healthText = "Valid";
+      healthText = this._t("healthValid");
     } else if (validState === "off") {
       healthClass = "invalid";
       healthIcon = "mdi:shield-alert-outline";
-      healthText = "Invalid";
+      healthText = this._t("healthInvalid");
     }
 
     const candidateClass = candidateState === "on" ? "candidate-active" : "";
-    const candidateText = candidateState === "on" ? "Available" : "None";
+    const candidateText =
+      candidateState === "on"
+        ? this._t("candidateAvailable")
+        : this._t("candidateNone");
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -340,12 +386,12 @@ class StpTokenRenewalCard extends HTMLElement {
           ${
             hasStpEntities
               ? `<div class="chips">
-                  ${this._chip("mdi:timer-sand", "Remaining", this._display(remainingEntity), remainingEntity)}
-                  ${this._chip("mdi:calendar-clock", "Expires", this._display(expiresEntity), expiresEntity)}
-                  ${this._chip("mdi:clock-check-outline", "Last check", this._display(lastCheckEntity), lastCheckEntity)}
-                  ${this._chip("mdi:key-plus", "New token", candidateText, candidateEntity, candidateClass)}
+                  ${this._chip("mdi:timer-sand", this._t("remaining"), this._display(remainingEntity), remainingEntity)}
+                  ${this._chip("mdi:calendar-clock", this._t("expires"), this._display(expiresEntity), expiresEntity)}
+                  ${this._chip("mdi:clock-check-outline", this._t("lastCheck"), this._display(lastCheckEntity), lastCheckEntity)}
+                  ${this._chip("mdi:key-plus", this._t("newToken"), candidateText, candidateEntity, candidateClass)}
                 </div>`
-              : `<div class="missing">STP Token Updater entities were not found. Configure the integration first or override the entity IDs in YAML.</div>`
+              : `<div class="missing">${escapeHtml(this._t("missing"))}</div>`
           }
         </div>
       </ha-card>
@@ -365,9 +411,9 @@ window.customCards = window.customCards || [];
 if (!window.customCards.some((card) => card.type === CARD_TAG)) {
   window.customCards.push({
     type: CARD_TAG,
-    name: "Token Renewal",
+    name: "STP Token Updater",
     preview: true,
-    description: "Compact status card for STP token renewal.",
+    description: "STP Token Updater",
     documentationURL:
       "https://github.com/CaneTLOTW/stp-token-updater#dashboard-card",
     getEntitySuggestion: (_hass, entityId) => {

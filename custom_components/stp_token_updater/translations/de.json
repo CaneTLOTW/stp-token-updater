@@ -109,21 +109,21 @@
       "token_expires_at": {"name": "Token-Ablauf"},
       "token_remaining_hours": {"name": "Token-Restlaufzeit"},
       "token_type": {"name": "Token-Typ"},
-      "trial_candidate_expires_at": {"name": "Trial-Kandidat Ablauf"},
-      "trial_candidate_remaining_hours": {"name": "Trial-Kandidat Restlaufzeit"},
-      "token_next_attempt": {"name": "Nächster Versuch"},
+      "trial_candidate_expires_at": {"name": "Trial-Kandidat: Ablauf"},
+      "trial_candidate_remaining_hours": {"name": "Trial-Kandidat: Restlaufzeit"},
+      "token_next_attempt": {"name": "Nächste Erneuerungsprüfung"},
       "token_last_check": {"name": "Letzte Provider-Prüfung"},
       "token_last_source_check": {"name": "Letzte Quellenprüfung"},
       "token_last_update": {"name": "Letzter Updateversuch"},
-      "token_last_success": {"name": "Letzter verifizierter Erfolg"},
+      "token_last_success": {"name": "Letzte erfolgreiche Verifikation"},
       "token_last_error": {"name": "Letzter Fehler"},
       "token_update_attempts": {"name": "Token-Schreibversuche"}
     },
     "binary_sensor": {
       "token_valid": {"name": "Token gültig"},
       "new_trial_token_available": {"name": "Neuer Trial-Token verfügbar"},
-      "token_update_required": {"name": "Token-Update erforderlich"},
-      "token_updater_problem": {"name": "Token-Updater Problem"},
+      "token_update_required": {"name": "Erneuerungsfenster aktiv"},
+      "token_updater_problem": {"name": "Updater-Zustand"},
       "api_reachable": {"name": "Provider-API erreichbar"}
     },
     "button": {

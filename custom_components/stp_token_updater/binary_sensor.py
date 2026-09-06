@@ -19,6 +19,7 @@ DESCRIPTIONS = (
     BinarySensorEntityDescription(
         key="token_valid",
         translation_key="token_valid",
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     BinarySensorEntityDescription(
         key="new_trial_token_available",
@@ -32,6 +33,7 @@ DESCRIPTIONS = (
         key="token_updater_problem",
         translation_key="token_updater_problem",
         device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     BinarySensorEntityDescription(
         key="api_reachable",

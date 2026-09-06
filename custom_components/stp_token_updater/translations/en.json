@@ -109,21 +109,21 @@
       "token_expires_at": {"name": "Token expires"},
       "token_remaining_hours": {"name": "Token remaining"},
       "token_type": {"name": "Token type"},
-      "trial_candidate_expires_at": {"name": "Trial candidate expires"},
-      "trial_candidate_remaining_hours": {"name": "Trial candidate remaining"},
-      "token_next_attempt": {"name": "Next attempt"},
+      "trial_candidate_expires_at": {"name": "Trial candidate: expires"},
+      "trial_candidate_remaining_hours": {"name": "Trial candidate: remaining"},
+      "token_next_attempt": {"name": "Next renewal check"},
       "token_last_check": {"name": "Last provider check"},
       "token_last_source_check": {"name": "Last source check"},
       "token_last_update": {"name": "Last update attempt"},
-      "token_last_success": {"name": "Last verified success"},
+      "token_last_success": {"name": "Last successful verification"},
       "token_last_error": {"name": "Last error"},
       "token_update_attempts": {"name": "Token write attempts"}
     },
     "binary_sensor": {
       "token_valid": {"name": "Token valid"},
       "new_trial_token_available": {"name": "New trial token available"},
-      "token_update_required": {"name": "Token update required"},
-      "token_updater_problem": {"name": "Token updater problem"},
+      "token_update_required": {"name": "Renewal window active"},
+      "token_updater_problem": {"name": "Updater health"},
       "api_reachable": {"name": "Provider API reachable"}
     },
     "button": {

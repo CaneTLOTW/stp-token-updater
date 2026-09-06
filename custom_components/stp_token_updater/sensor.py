@@ -36,6 +36,7 @@ DESCRIPTIONS = (
         translation_key="token_remaining_hours",
         native_unit_of_measurement=UnitOfTime.HOURS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
     ),
     SensorEntityDescription(
         key="token_type",
@@ -53,13 +54,13 @@ DESCRIPTIONS = (
         translation_key="trial_candidate_remaining_hours",
         native_unit_of_measurement=UnitOfTime.HOURS,
         state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
         key="token_next_attempt",
         translation_key="token_next_attempt",
         device_class=SensorDeviceClass.TIMESTAMP,
-        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
         key="token_last_check",
