@@ -23,6 +23,24 @@ def test_sensor_descriptions_use_translation_keys() -> None:
     }
 
 
+def test_entity_presentation_contract() -> None:
+    from homeassistant.const import EntityCategory
+
+    from custom_components.stp_token_updater.binary_sensor import (
+        DESCRIPTIONS as BINARY_DESCRIPTIONS,
+    )
+    from custom_components.stp_token_updater.sensor import DESCRIPTIONS as SENSOR_DESCRIPTIONS
+
+    sensors = {description.key: description for description in SENSOR_DESCRIPTIONS}
+    binary = {description.key: description for description in BINARY_DESCRIPTIONS}
+
+    assert sensors["token_remaining_hours"].suggested_display_precision == 1
+    assert sensors["trial_candidate_remaining_hours"].suggested_display_precision == 1
+    assert sensors["token_next_attempt"].entity_category is None
+    assert binary["token_valid"].entity_category == EntityCategory.DIAGNOSTIC
+    assert binary["token_updater_problem"].entity_category == EntityCategory.DIAGNOSTIC
+
+
 def test_repairs_module_uses_current_issue_registry_api() -> None:
     from custom_components.stp_token_updater import repairs
 
@@ -45,7 +63,7 @@ def test_manifest_matches_new_public_domain() -> None:
     manifest = json.loads((INTEGRATION / "manifest.json").read_text())
     assert manifest["domain"] == "stp_token_updater"
     assert manifest["name"] == "STP Token Updater"
-    assert manifest["version"] == "0.2.4"
+    assert manifest["version"] == "0.2.5"
     assert {"frontend", "http"}.issubset(manifest["dependencies"])
 
 
