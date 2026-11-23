@@ -92,7 +92,9 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: ubuntu-latest
+    # Python 3.14.2 is available for the 24.04 hosted image; GitHub's newer
+    # ubuntu-latest/26.04 image does not currently publish this exact runtime.
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 DOMAIN = "stp_token_updater"
-VERSION = "0.2.5"
+VERSION = "0.2.6"
 
 CONF_PROVIDER_URL = "provider_url"
 CONF_AUTH_METHOD = "auth_method"
@@ -42,7 +42,7 @@ POST_EXPIRY_RETRY = timedelta(hours=6)
 SOURCE_REFRESH_NORMAL = timedelta(hours=6)
 SOURCE_REFRESH_RENEWAL = timedelta(hours=3)
 SOURCE_REFRESH_WARNING = timedelta(hours=1)
-SOURCE_REFRESH_EXPIRED = timedelta(hours=6)
+SOURCE_REFRESH_EXPIRED = timedelta(minutes=15)
 
 EVENT_WARNING = "stp_token_updater_warning"
 
